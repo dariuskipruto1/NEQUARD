@@ -11,6 +11,10 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+nequard:
+  security:
+    jwt-secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-32}
+    jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 management:
   endpoints:
     web:
