@@ -1,0 +1,3 @@
+package com.nequard.security;
+import jakarta.persistence.*;import java.time.Instant;import java.util.UUID;
+@Entity @Table(name="security_events") public class SecurityEvent{@Id @GeneratedValue(strategy=GenerationType.UUID)UUID id;@Column(nullable=false)String eventType;String severity,source,details;Instant occurredAt=Instant.now();public UUID getId(){return id;}public String getEventType(){return eventType;}public void setEventType(String v){eventType=v;}public String getSeverity(){return severity;}public void setSeverity(String v){severity=v;}public String getSource(){return source;}public void setSource(String v){source=v;}public String getDetails(){return details;}public void setDetails(String v){details=v;}public Instant getOccurredAt(){return occurredAt;}}
