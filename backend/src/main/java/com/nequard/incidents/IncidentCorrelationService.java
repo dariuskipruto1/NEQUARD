@@ -1,0 +1,7 @@
+package com.nequard.incidents;
+import com.nequard.alerts.*;import com.nequard.network.Device;import com.nequard.network.DeviceRepository;import org.springframework.stereotype.Service;import java.util.*;
+@Service public class IncidentCorrelationService{
+private final IncidentRepository incidents;private final AlertRepository alerts;private final DeviceRepository devices;
+public IncidentCorrelationService(IncidentRepository i,AlertRepository a,DeviceRepository d){incidents=i;alerts=a;devices=d;}
+public Incident correlate(Alert alert){if(alert.getOrganizationId()==null)return null;var open=incidents.findByOrganizationIdOrderByDetectedAtDesc(alert.getOrganizationId()).stream().filter(i->!"RESOLVED".equals(i.getStatus())&&!"CLOSED".equals(i.getStatus())).findFirst();if(open.isPresent()){Incident i=open.get();if(alert.getMessage()!=null){i.setRootCause(i.getRootCause()==null?alert.getMessage():i.getRootCause());}return incidents.save(i);}Incident i=new Incident();i.setOrganizationId(alert.getOrganizationId());i.setTitle("Incident: "+alert.getTitle());i.setPriority(alert.getSeverity());i.setRootCause("Probable cause requires diagnostic correlation; initial evidence: "+Optional.ofNullable(alert.getMessage()).orElse("alert"));i.setConfidence(0.5);return incidents.save(i);}
+}
