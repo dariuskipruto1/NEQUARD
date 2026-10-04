@@ -1,0 +1,1 @@
+package com.nequard.monitoring;import org.springframework.data.jpa.repository.JpaRepository;import java.util.UUID;public interface MetricSnapshotRepository extends JpaRepository<MetricSnapshot,UUID>{java.util.List<MetricSnapshot> findTop100ByDeviceIdOrderByRecordedAtDesc(UUID deviceId);}
