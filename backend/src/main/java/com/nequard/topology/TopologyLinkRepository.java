@@ -1,0 +1,1 @@
+package com.nequard.topology;import org.springframework.data.jpa.repository.JpaRepository;import java.util.UUID;public interface TopologyLinkRepository extends JpaRepository<TopologyLink,UUID>{}
