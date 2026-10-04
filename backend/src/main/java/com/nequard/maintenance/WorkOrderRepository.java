@@ -1,0 +1,1 @@
+package com.nequard.maintenance;import org.springframework.data.jpa.repository.JpaRepository;import java.util.UUID;public interface WorkOrderRepository extends JpaRepository<WorkOrder,UUID>{}
