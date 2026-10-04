@@ -17,10 +17,11 @@ public class MonitoringEngine {
     private final DeviceRepository devices;
     private final MetricSnapshotRepository metrics;
     private final AlertRepository alerts;
+    private final com.nequard.incidents.IncidentRepository incidents;
     private final int timeoutMs;
 
     public MonitoringEngine(DeviceRepository devices, MetricSnapshotRepository metrics, AlertRepository alerts,
-                            @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs) {
+                            com.nequard.incidents.IncidentRepository incidents, @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs) {
         this.devices = devices;
         this.alerts = alerts;
         this.metrics = metrics;
@@ -68,6 +69,18 @@ public class MonitoringEngine {
             alert.setOrganizationId(device.getOrganizationId());
             alert.setMessage("Automated monitoring could not reach the management endpoint. Verify upstream connectivity and device status.");
             alerts.save(alert);
+            if (device.getOrganizationId() != null
+                    && incidents.findByOrganizationIdOrderByDetectedAtDesc(device.getOrganizationId()).stream()
+                    .noneMatch(i -> "DETECTED".equals(i.getStatus())
+                            && i.getTitle().equals("Network incident: " + device.getHostname()))) {
+                var incident = new com.nequard.incidents.Incident();
+                incident.setTitle("Network incident: " + device.getHostname());
+                incident.setPriority("HIGH");
+                incident.setRootCause("DEVICE_UNREACHABLE");
+                incident.setConfidence(0.85);
+                incident.setOrganizationId(device.getOrganizationId());
+                incidents.save(incident);
+            }
         }
 
         MetricSnapshot snapshot = new MetricSnapshot();
