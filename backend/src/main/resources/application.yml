@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: nequard-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/nequard}
+    username: ${POSTGRES_USER:nequard}
+    password: ${POSTGRES_PASSWORD:nequard_dev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+server:
+  port: ${PORT:8080}
