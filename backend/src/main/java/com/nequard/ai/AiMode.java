@@ -1,0 +1,1 @@
+package com.nequard.ai;public enum AiMode{READ_ONLY,DIAGNOSTIC,ADMINISTRATIVE}
