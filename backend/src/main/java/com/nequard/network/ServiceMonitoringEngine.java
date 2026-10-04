@@ -10,10 +10,10 @@ public class ServiceMonitoringEngine {
     private final ServiceMonitorRepository services;
     private final int timeoutMs;
     public ServiceMonitoringEngine(ServiceMonitorRepository services,
-                                   org.springframework.beans.factory.annotation.Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs){
+                                   org.springframework.beans.factory.annotation.Value("\${nequard.monitoring.timeout-ms:2000}") int timeoutMs){
         this.services=services;this.timeoutMs=timeoutMs;
     }
-    @Scheduled(fixedDelayString="${nequard.monitoring.interval-ms:30000}")
+    @Scheduled(fixedDelayString="\${nequard.monitoring.interval-ms:30000}")
     public void collect(){services.findAll().forEach(this::check);}
     void check(ServiceMonitor s){
         long start=System.nanoTime(); boolean ok=false;
