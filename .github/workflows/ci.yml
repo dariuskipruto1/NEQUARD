@@ -50,4 +50,4 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Test ML service
-        run: pytest -q
+        run: PYTHONPATH=. pytest -q
