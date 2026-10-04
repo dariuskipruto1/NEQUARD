@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_metric_recorded_at ON metric_snapshots(recorded_at DESC);
