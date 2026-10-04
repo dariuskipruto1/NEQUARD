@@ -1,0 +1,1 @@
+package com.nequard.community;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface ReputationRepository extends JpaRepository<Reputation,UUID>{Optional<Reputation> findByUserId(UUID userId);}
