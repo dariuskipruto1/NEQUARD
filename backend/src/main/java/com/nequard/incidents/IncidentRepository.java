@@ -1,1 +1,1 @@
-package com.nequard.incidents;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface IncidentRepository extends JpaRepository<Incident,UUID>{List<Incident> findByStatusOrderByDetectedAtDesc(String status);}
+package com.nequard.incidents;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface IncidentRepository extends JpaRepository<Incident,UUID>{List<Incident> findByStatusOrderByDetectedAtDesc(String status);List<Incident> findByOrganizationIdOrderByDetectedAtDesc(UUID organizationId);}
