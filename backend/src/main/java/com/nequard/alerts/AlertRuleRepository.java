@@ -1,0 +1,1 @@
+package com.nequard.alerts;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface AlertRuleRepository extends JpaRepository<AlertRule,UUID>{List<AlertRule> findByOrganizationIdAndEnabledTrue(UUID organizationId);}
