@@ -1,0 +1,3 @@
+package com.nequard.incidents;
+import org.springframework.web.bind.annotation.*;import java.time.Instant;import java.util.*;
+@RestController @RequestMapping("/api/v1/incidents") public class IncidentController{private final IncidentRepository repo;public IncidentController(IncidentRepository r){repo=r;}@GetMapping public List<Incident> all(){return repo.findAll();}@PostMapping public Incident create(@RequestBody Incident i){return repo.save(i);}@PatchMapping("/{id}/status")public Incident status(@PathVariable UUID id,@RequestParam String value){Incident i=repo.findById(id).orElseThrow();i.setStatus(value.toUpperCase());if("RESOLVED".equalsIgnoreCase(value))i.setResolvedAt(Instant.now());return repo.save(i);}}
