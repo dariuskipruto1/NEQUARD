@@ -1,10 +1,10 @@
 package com.nequard.network;
-import jakarta.validation.Valid;import jakarta.validation.constraints.NotBlank;import org.springframework.http.*;import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;import java.util.*;
-@RestController @RequestMapping("/api/v1/devices") public class DeviceController {
- private final DeviceRepository repo; public DeviceController(DeviceRepository r){repo=r;}
- record Request(@NotBlank String hostname,String managementIp,DeviceType deviceType,String vendor,String model){}
- @GetMapping public List<Device> all(){return repo.findAll();}
+import jakarta.validation.Valid;import jakarta.validation.constraints.NotBlank;import jakarta.validation.constraints.NotNull;import org.springframework.http.*;import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/devices") public class DeviceController{
+ private final DeviceRepository repo;public DeviceController(DeviceRepository r){repo=r;}
+ record Request(@NotBlank String hostname,@NotNull UUID organizationId,UUID locationId,String managementIp,String macAddress,DeviceType deviceType,String vendor,String model,String serialNumber,String osVersion,String firmwareVersion,String building,String room,String managementProtocol,Double latitude,Double longitude){}
+ @GetMapping public List<Device> all(@RequestParam(required=false) UUID organizationId){return organizationId==null?repo.findAll():repo.findByOrganizationId(organizationId);}
  @GetMapping("/{id}") public ResponseEntity<Device> one(@PathVariable UUID id){return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());}
- @PostMapping @PreAuthorize("hasAnyRole('SUPER_ADMIN','NETWORK_ADMIN','NETWORK_ENGINEER')") public ResponseEntity<Device> create(@RequestBody @Valid Request r){Device d=new Device();d.setHostname(r.hostname());d.setManagementIp(r.managementIp());d.setDeviceType(r.deviceType()==null?DeviceType.OTHER:r.deviceType());d.setVendor(r.vendor());d.setModel(r.model());return ResponseEntity.status(HttpStatus.CREATED).body(repo.save(d));}
+ @PostMapping @PreAuthorize("hasAnyRole('SUPER_ADMIN','NETWORK_ADMIN','NETWORK_ENGINEER')") public ResponseEntity<Device> create(@RequestBody @Valid Request r){Device d=new Device();d.setHostname(r.hostname());d.setOrganizationId(r.organizationId());d.setLocationId(r.locationId());d.setManagementIp(r.managementIp());d.setMacAddress(r.macAddress());d.setDeviceType(r.deviceType()==null?DeviceType.OTHER:r.deviceType());d.setVendor(r.vendor());d.setModel(r.model());d.setSerialNumber(r.serialNumber());d.setOsVersion(r.osVersion());d.setFirmwareVersion(r.firmwareVersion());d.setBuilding(r.building());d.setRoom(r.room());d.setManagementProtocol(r.managementProtocol());d.setLatitude(r.latitude());d.setLongitude(r.longitude());return ResponseEntity.status(HttpStatus.CREATED).body(repo.save(d));}
  @DeleteMapping("/{id}") @PreAuthorize("hasAnyRole('SUPER_ADMIN','NETWORK_ADMIN')") public ResponseEntity<Void> delete(@PathVariable UUID id){if(!repo.existsById(id))return ResponseEntity.notFound().build();repo.deleteById(id);return ResponseEntity.noContent().build();}
 }
