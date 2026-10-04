@@ -1,0 +1,1 @@
+CREATE TABLE security_events(id UUID PRIMARY KEY,event_type VARCHAR(80) NOT NULL,severity VARCHAR(30),source VARCHAR(200),details TEXT,occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);CREATE INDEX idx_security_event_time ON security_events(occurred_at DESC);
