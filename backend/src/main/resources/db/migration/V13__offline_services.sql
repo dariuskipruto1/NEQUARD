@@ -1,0 +1,1 @@
+CREATE TABLE local_services(id UUID PRIMARY KEY,name VARCHAR(160) NOT NULL,category VARCHAR(80),endpoint VARCHAR(300),status VARCHAR(30) NOT NULL DEFAULT 'AVAILABLE',sync_enabled BOOLEAN NOT NULL DEFAULT TRUE);CREATE INDEX idx_local_service_status ON local_services(status);
