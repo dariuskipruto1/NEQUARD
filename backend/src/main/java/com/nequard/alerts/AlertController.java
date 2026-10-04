@@ -1,0 +1,3 @@
+package com.nequard.alerts;
+import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/alerts") public class AlertController{private final AlertRepository repo;public AlertController(AlertRepository r){repo=r;}@GetMapping public List<Alert> all(@RequestParam(defaultValue="OPEN")String status){return repo.findByStatusOrderByCreatedAtDesc(status);}@PostMapping public Alert create(@RequestBody Alert a){return repo.save(a);}@PatchMapping("/{id}/acknowledge")public Alert acknowledge(@PathVariable UUID id){Alert a=repo.findById(id).orElseThrow();a.setStatus("ACKNOWLEDGED");return repo.save(a);}}
