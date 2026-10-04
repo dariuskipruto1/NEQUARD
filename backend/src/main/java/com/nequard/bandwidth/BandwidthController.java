@@ -1,0 +1,3 @@
+package com.nequard.bandwidth;
+import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/bandwidth") public class BandwidthController{private final BandwidthRepository repo;public BandwidthController(BandwidthRepository r){repo=r;}@GetMapping("/allocations")public List<BandwidthAllocation> all(){return repo.findAll();}@GetMapping("/nodes/{nodeId}")public List<BandwidthAllocation> node(@PathVariable UUID nodeId){return repo.findByNodeId(nodeId);}@PostMapping("/allocations")public BandwidthAllocation create(@RequestBody BandwidthAllocation a){return repo.save(a);}}
