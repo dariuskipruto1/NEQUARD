@@ -1,0 +1,1 @@
+CREATE TABLE community_nodes(id UUID PRIMARY KEY,name VARCHAR(160) NOT NULL,node_type VARCHAR(40) NOT NULL DEFAULT 'HOTSPOT',status VARCHAR(30) NOT NULL DEFAULT 'ONLINE',upstream_type VARCHAR(40) NOT NULL DEFAULT 'FIBER',capacity_mbps DOUBLE PRECISION,latitude DOUBLE PRECISION,longitude DOUBLE PRECISION);CREATE INDEX idx_community_node_status ON community_nodes(status);
