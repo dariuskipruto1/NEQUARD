@@ -1,6 +1,8 @@
 package com.nequard.monitoring;
 
 import com.nequard.network.Device;
+import com.nequard.alerts.Alert;
+import com.nequard.alerts.AlertRepository;
 import com.nequard.network.DeviceRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,11 +16,13 @@ import java.time.Instant;
 public class MonitoringEngine {
     private final DeviceRepository devices;
     private final MetricSnapshotRepository metrics;
+    private final AlertRepository alerts;
     private final int timeoutMs;
 
-    public MonitoringEngine(DeviceRepository devices, MetricSnapshotRepository metrics,
+    public MonitoringEngine(DeviceRepository devices, MetricSnapshotRepository metrics, AlertRepository alerts,
                             @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs) {
         this.devices = devices;
+        this.alerts = alerts;
         this.metrics = metrics;
         this.timeoutMs = timeoutMs;
     }
@@ -55,6 +59,16 @@ public class MonitoringEngine {
         device.setOperationalStatus(reachable ? "ONLINE" : "OFFLINE");
         if (reachable) device.setLastSeenAt(now);
         devices.save(device);
+
+        if (!reachable && device.getOrganizationId() != null && !alerts.existsByDeviceIdAndStatus(device.getId(), "OPEN")) {
+            Alert alert = new Alert();
+            alert.setTitle("Device unreachable: " + device.getHostname());
+            alert.setSeverity("CRITICAL");
+            alert.setDeviceId(device.getId());
+            alert.setOrganizationId(device.getOrganizationId());
+            alert.setMessage("Automated monitoring could not reach the management endpoint. Verify upstream connectivity and device status.");
+            alerts.save(alert);
+        }
 
         MetricSnapshot snapshot = new MetricSnapshot();
         snapshot.setDeviceId(device.getId());
