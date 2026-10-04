@@ -1,3 +1,9 @@
 package com.nequard.bandwidth;
 import jakarta.persistence.*;import java.util.UUID;
-@Entity @Table(name="bandwidth_allocations") public class BandwidthAllocation{@Id @GeneratedValue(strategy=GenerationType.UUID)UUID id;@Column(nullable=false)UUID nodeId;@Column(nullable=false)Double allocatedMbps;Double usedMbps;String policy="FAIR_SHARE",status="ACTIVE";public UUID getId(){return id;}public UUID getNodeId(){return nodeId;}public void setNodeId(UUID v){nodeId=v;}public Double getAllocatedMbps(){return allocatedMbps;}public void setAllocatedMbps(Double v){allocatedMbps=v;}public Double getUsedMbps(){return usedMbps;}public void setUsedMbps(Double v){usedMbps=v;}public String getPolicy(){return policy;}public void setPolicy(String v){policy=v;}public String getStatus(){return status;}public void setStatus(String v){status=v;}}
+@Entity @Table(name="bandwidth_allocations") public class BandwidthAllocation{
+@Id @GeneratedValue(strategy=GenerationType.UUID) UUID id;
+@Column(nullable=false) UUID nodeId;@Column(name="organization_id",nullable=false) UUID organizationId;
+@Column(nullable=false) Double allocatedMbps;Double usedMbps;String policy="FAIR_SHARE",status="ACTIVE";
+public UUID getId(){return id;}public UUID getNodeId(){return nodeId;}public void setNodeId(UUID v){nodeId=v;}public UUID getOrganizationId(){return organizationId;}public void setOrganizationId(UUID v){organizationId=v;}
+public Double getAllocatedMbps(){return allocatedMbps;}public void setAllocatedMbps(Double v){allocatedMbps=v;}public Double getUsedMbps(){return usedMbps;}public void setUsedMbps(Double v){usedMbps=v;}
+public String getPolicy(){return policy;}public void setPolicy(String v){policy=v;}public String getStatus(){return status;}public void setStatus(String v){status=v;}}
