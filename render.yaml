@@ -3,20 +3,36 @@ services:
     name: nequard-backend
     runtime: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
-      - key: DATABASE_URL
+      - key: DB_HOST
         fromDatabase:
           name: nequard-postgres
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: nequard-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: nequard-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: nequard-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: nequard-postgres
+          property: password
   - type: web
     name: nequard-ml
     runtime: docker
     plan: free
     dockerfilePath: ./ml-service/Dockerfile
     dockerContext: ./ml-service
-  - type: static
+  - type: web
     name: nequard-frontend
     runtime: static
     plan: free
@@ -25,5 +41,6 @@ services:
 databases:
   - name: nequard-postgres
     plan: free
-    databaseName: nequard
-    user: nequard
+    region: frankfurt
+    databaseName: nequard_postgres
+    user: nequard_postgres_user
