@@ -1,0 +1,3 @@
+package com.nequard.community;
+import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/community/reputation") public class ReputationController{private final ReputationRepository repo;public ReputationController(ReputationRepository r){repo=r;}@GetMapping("/{userId}")public Reputation get(@PathVariable UUID userId){return repo.findByUserId(userId).orElseGet(()->{Reputation x=new Reputation();x.setUserId(userId);return repo.save(x);});}@PutMapping("/{userId}")public Reputation update(@PathVariable UUID userId,@RequestBody Reputation x){x.setUserId(userId);return repo.save(x);}}
