@@ -1,0 +1,1 @@
+package com.nequard.security;import org.springframework.web.bind.annotation.*;import java.util.*;@RestController @RequestMapping("/api/v1/security") public class SecurityRulesController{private final SecurityRules rules;public SecurityRulesController(SecurityRules r){rules=r;}@GetMapping("/capabilities")public Map<String,Object> capabilities(){return rules.capabilities();}}
