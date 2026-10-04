@@ -1,0 +1,1 @@
+package com.nequard.network;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface NetworkInterfaceRepository extends JpaRepository<NetworkInterface,UUID>{List<NetworkInterface> findByDeviceId(UUID deviceId);}
