@@ -1,0 +1,3 @@
+package com.nequard.community;
+import jakarta.persistence.*;import java.util.UUID;
+@Entity @Table(name="reputations") public class Reputation{@Id @GeneratedValue(strategy=GenerationType.UUID)UUID id;@Column(nullable=false,unique=true)UUID userId;double score=50;int verifiedContributions;int feedbackCount;public UUID getId(){return id;}public UUID getUserId(){return userId;}public void setUserId(UUID v){userId=v;}public double getScore(){return score;}public void setScore(double v){score=Math.max(0,Math.min(100,v));}public int getVerifiedContributions(){return verifiedContributions;}public void setVerifiedContributions(int v){verifiedContributions=v;}public int getFeedbackCount(){return feedbackCount;}public void setFeedbackCount(int v){feedbackCount=v;}}
