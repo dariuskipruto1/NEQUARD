@@ -1,1 +1,1 @@
-package com.nequard.network; import org.springframework.data.jpa.repository.JpaRepository; import java.util.UUID; public interface DeviceRepository extends JpaRepository<Device,UUID>{}
+package com.nequard.network; import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface DeviceRepository extends JpaRepository<Device,UUID>{List<Device> findByOrganizationId(UUID organizationId);}
