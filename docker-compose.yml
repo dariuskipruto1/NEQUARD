@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: nequard
+      POSTGRES_USER: nequard
+      POSTGRES_PASSWORD: nequard_dev
+    ports: ['5432:5432']
+    volumes: [nequard_pg:/var/lib/postgresql/data]
+  backend:
+    build: ./backend
+    ports: ['8080:8080']
+    depends_on: [postgres]
+  ml-service:
+    build: ./ml-service
+    ports: ['8000:8000']
+volumes:
+  nequard_pg:
