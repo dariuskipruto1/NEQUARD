@@ -1,0 +1,3 @@
+package com.nequard.maintenance;
+import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/work-orders") public class WorkOrderController{private final WorkOrderRepository repo;public WorkOrderController(WorkOrderRepository r){repo=r;}@GetMapping public List<WorkOrder> all(){return repo.findAll();}@PostMapping public WorkOrder create(@RequestBody WorkOrder w){return repo.save(w);}@PatchMapping("/{id}/status")public WorkOrder status(@PathVariable UUID id,@RequestParam String value){WorkOrder w=repo.findById(id).orElseThrow();w.setStatus(value.toUpperCase());return repo.save(w);}}
