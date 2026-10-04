@@ -1,0 +1,1 @@
+package com.nequard.rewards;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface NqdRepository extends JpaRepository<NqdLedgerEntry,UUID>{List<NqdLedgerEntry> findByUserIdOrderByCreatedAtDesc(UUID userId);}
