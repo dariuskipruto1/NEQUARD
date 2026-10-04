@@ -1,0 +1,1 @@
+package com.nequard.offline;import org.springframework.data.jpa.repository.JpaRepository;import java.util.UUID;public interface LocalServiceRepository extends JpaRepository<LocalService,UUID>{}
