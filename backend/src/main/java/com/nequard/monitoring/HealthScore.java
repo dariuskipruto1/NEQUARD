@@ -1,0 +1,2 @@
+package com.nequard.monitoring;
+public final class HealthScore{private HealthScore(){}public static double calculate(double availability,double latency,double loss,double cpu,double memory,double iface,double errors,double anomaly,double historical){double s=availability*.25+latency*.15+loss*.15+cpu*.10+memory*.10+iface*.10+errors*.05+anomaly*.05+historical*.05;return Math.max(0,Math.min(100,s));}public static String band(double s){return s>=90?"HEALTHY":s>=75?"WARNING":s>=50?"DEGRADED":s>=25?"CRITICAL":"OFFLINE";}}
