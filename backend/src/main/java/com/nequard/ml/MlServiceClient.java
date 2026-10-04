@@ -1,0 +1,3 @@
+package com.nequard.ml;
+import org.springframework.beans.factory.annotation.Value;import org.springframework.stereotype.Service;import org.springframework.web.client.RestClient;
+@Service public class MlServiceClient{private final RestClient client;public MlServiceClient(@Value("${nequard.ml.url:http://localhost:8000}")String url){client=RestClient.builder().baseUrl(url).build();}public String anomaly(Object body){return client.post().uri("/ml/anomaly/detect").body(body).retrieve().body(String.class);}public String failure(Object body){return client.post().uri("/ml/failure/predict").body(body).retrieve().body(String.class);}public String rootCause(Object body){return client.post().uri("/ml/root-cause/analyze").body(body).retrieve().body(String.class);}}
