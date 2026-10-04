@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: nequard-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nequard-postgres
+          property: connectionString
+  - type: web
+    name: nequard-ml
+    runtime: docker
+    plan: free
+    dockerfilePath: ./ml-service/Dockerfile
+    dockerContext: ./ml-service
+  - type: static
+    name: nequard-frontend
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+databases:
+  - name: nequard-postgres
+    plan: free
+    databaseName: nequard
+    user: nequard
