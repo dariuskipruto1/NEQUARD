@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.net.InetAddress;
+import java.net.*;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -26,7 +26,8 @@ public class MonitoringEngine {
     @Scheduled(fixedDelayString = "${nequard.monitoring.interval-ms:30000}")
     public void collect() {
         for (Device device : devices.findAll()) {
-            collectDevice(device);
+            try { collectDevice(device); }
+            catch (Exception ignored) { /* isolate failed targets */ }
         }
     }
 
@@ -34,25 +35,25 @@ public class MonitoringEngine {
         Instant started = Instant.now();
         boolean reachable = false;
         Double latency = null;
+        String ip = device.getManagementIp();
 
-        if (device.getManagementIp() != null && !device.getManagementIp().isBlank()) {
+        if (ip != null && !ip.isBlank()) {
             try {
-                InetAddress address = InetAddress.getByName(device.getManagementIp().trim());
-                reachable = address.isReachable(timeoutMs);
-                if (reachable) {
-                    latency = Duration.between(started, Instant.now()).toNanos() / 1_000_000.0;
-                }
-            } catch (Exception ignored) {
-                // Monitoring must isolate one failed target from the rest of the collection cycle.
-            }
+                String protocol = device.getManagementProtocol() == null ? "ICMP"
+                        : device.getManagementProtocol().trim().toUpperCase();
+                reachable = switch (protocol) {
+                    case "HTTP", "HTTPS" -> httpCheck(ip, protocol);
+                    case "TCP", "SSH", "SNMP", "SNMPV2C", "SNMPV3", "DNS" -> tcpCheck(ip, defaultPort(protocol));
+                    default -> InetAddress.getByName(ip.trim()).isReachable(timeoutMs);
+                };
+                if (reachable) latency = Duration.between(started, Instant.now()).toNanos() / 1_000_000.0;
+            } catch (Exception ignored) { }
         }
 
         Instant now = Instant.now();
         device.setMonitoringStatus(reachable ? "UP" : "DOWN");
         device.setOperationalStatus(reachable ? "ONLINE" : "OFFLINE");
-        if (reachable) {
-            device.setLastSeenAt(now);
-        }
+        if (reachable) device.setLastSeenAt(now);
         devices.save(device);
 
         MetricSnapshot snapshot = new MetricSnapshot();
@@ -64,5 +65,35 @@ public class MonitoringEngine {
         snapshot.setMemoryPercent(device.getMemoryPercent());
         snapshot.setStatus(device.getOperationalStatus());
         metrics.save(snapshot);
+    }
+
+    private boolean tcpCheck(String host, int port) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host.trim(), port), timeoutMs);
+            return true;
+        } catch (Exception e) { return false; }
+    }
+
+    private boolean httpCheck(String host, String protocol) {
+        try {
+            URL url = URI.create(protocol.toLowerCase() + "://" + host.trim()).toURL();
+            HttpURLConnection c = (HttpURLConnection) url.openConnection();
+            c.setConnectTimeout(timeoutMs);
+            c.setReadTimeout(timeoutMs);
+            c.setRequestMethod("HEAD");
+            c.setInstanceFollowRedirects(false);
+            int code = c.getResponseCode();
+            c.disconnect();
+            return code > 0 && code < 500;
+        } catch (Exception e) { return false; }
+    }
+
+    private int defaultPort(String protocol) {
+        return switch (protocol) {
+            case "SSH" -> 22;
+            case "SNMP", "SNMPV2C", "SNMPV3" -> 161;
+            case "DNS" -> 53;
+            default -> 443;
+        };
     }
 }
