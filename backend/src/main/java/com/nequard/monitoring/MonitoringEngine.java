@@ -5,6 +5,7 @@ import com.nequard.alerts.Alert;
 import com.nequard.alerts.AlertRepository;
 import com.nequard.alerts.AlertEvaluationService;
 import com.nequard.incidents.IncidentCorrelationService;
+import com.nequard.incidents.IncidentRepository;
 import com.nequard.network.DeviceRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,17 +22,19 @@ public class MonitoringEngine {
     private final DeviceRepository devices;
     private final MetricSnapshotRepository metrics;
     private final AlertRepository alerts;
-    private final com.nequard.incidents.IncidentRepository incidents;
+    private final IncidentRepository incidents;
     private final int timeoutMs;
     private final AlertEvaluationService alertRules;
     private final IncidentCorrelationService correlation;
 
     public MonitoringEngine(DeviceRepository devices, MetricSnapshotRepository metrics, AlertRepository alerts,
-                            com.nequard.incidents.IncidentRepository incidents, @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs,
+                            IncidentRepository incidents,
+                            @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs,
                             AlertEvaluationService alertRules, IncidentCorrelationService correlation) {
         this.devices = devices;
-        this.alerts = alerts;
         this.metrics = metrics;
+        this.alerts = alerts;
+        this.incidents = incidents;
         this.timeoutMs = timeoutMs;
         this.alertRules = alertRules;
         this.correlation = correlation;
@@ -41,7 +44,7 @@ public class MonitoringEngine {
     public void collect() {
         for (Device device : devices.findAll()) {
             try { collectDevice(device); }
-            catch (Exception ignored) { /* isolate failed targets */ }
+            catch (Exception ignored) { }
         }
     }
 
@@ -79,10 +82,9 @@ public class MonitoringEngine {
             alert.setMessage("Automated monitoring could not reach the management endpoint. Verify upstream connectivity and device status.");
             alerts.save(alert);
             correlation.correlate(alert);
-            if (device.getOrganizationId() != null
-                    && incidents.findByOrganizationIdOrderByDetectedAtDesc(device.getOrganizationId()).stream()
+            if (incidents.findByOrganizationIdOrderByDetectedAtDesc(device.getOrganizationId()).stream()
                     .noneMatch(i -> "DETECTED".equals(i.getStatus())
-                            && i.getTitle().equals("Network incident: " + device.getHostname()))) {
+                            && ("Network incident: " + device.getHostname()).equals(i.getTitle()))) {
                 var incident = new com.nequard.incidents.Incident();
                 incident.setTitle("Network incident: " + device.getHostname());
                 incident.setPriority("HIGH");
@@ -102,6 +104,7 @@ public class MonitoringEngine {
         snapshot.setMemoryPercent(device.getMemoryPercent());
         snapshot.setStatus(device.getOperationalStatus());
         metrics.save(snapshot);
+
         Map<String,Double> values = new HashMap<>();
         if (latency != null) values.put("latency", latency);
         if (device.getCpuPercent() != null) values.put("cpu", device.getCpuPercent());
