@@ -1,0 +1,2 @@
+package com.nequard.security;
+public record FraudAssessment(double riskScore,String decision,String[] signals){public static FraudAssessment assess(int failedLogins,int unusualSources,int trafficSpikes){double r=Math.min(1.0,failedLogins*.02+unusualSources*.08+trafficSpikes*.05);String d=r>=.8?"REVIEW_REQUIRED":r>=.5?"ELEVATED":"NORMAL";return new FraudAssessment(r,d,new String[]{"failed_logins","unusual_sources","traffic_spikes"});}}
