@@ -1,0 +1,1 @@
+CREATE TABLE nqd_ledger(id UUID PRIMARY KEY,user_id UUID NOT NULL,amount BIGINT NOT NULL,type VARCHAR(40) NOT NULL,description TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);CREATE INDEX idx_nqd_user_time ON nqd_ledger(user_id,created_at DESC);
