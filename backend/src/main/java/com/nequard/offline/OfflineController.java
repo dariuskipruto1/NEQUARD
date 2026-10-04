@@ -1,3 +1,5 @@
 package com.nequard.offline;
-import org.springframework.web.bind.annotation.*;import java.util.*;
-@RestController @RequestMapping("/api/v1/offline") public class OfflineController{private final LocalServiceRepository repo;public OfflineController(LocalServiceRepository r){repo=r;}@GetMapping("/services")public List<LocalService> services(){return repo.findAll();}@PostMapping("/services")public LocalService create(@RequestBody LocalService s){return repo.save(s);}}
+import com.nequard.auth.OrganizationAccessService;import org.springframework.security.core.Authentication;import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/offline") public class OfflineController{private final LocalServiceRepository repo;private final OrganizationAccessService access;public OfflineController(LocalServiceRepository r,OrganizationAccessService a){repo=r;access=a;}
+@GetMapping("/services")public List<LocalService> services(Authentication a){return access.isSuperAdmin(a)?repo.findAll():repo.findByOrganizationId(access.currentOrganization(a));}
+@PostMapping("/services")@PreAuthorize("hasAnyRole('SUPER_ADMIN','NETWORK_ADMIN','COMMUNITY_ADMIN','TECHNICIAN')")public LocalService create(Authentication a,@RequestBody LocalService s){s.setOrganizationId(access.requireOrganization(a,s.getOrganizationId()));return repo.save(s);}}
