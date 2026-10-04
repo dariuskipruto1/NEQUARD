@@ -3,6 +3,8 @@ package com.nequard.monitoring;
 import com.nequard.network.Device;
 import com.nequard.alerts.Alert;
 import com.nequard.alerts.AlertRepository;
+import com.nequard.alerts.AlertEvaluationService;
+import com.nequard.incidents.IncidentCorrelationService;
 import com.nequard.network.DeviceRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.net.*;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class MonitoringEngine {
@@ -19,13 +23,18 @@ public class MonitoringEngine {
     private final AlertRepository alerts;
     private final com.nequard.incidents.IncidentRepository incidents;
     private final int timeoutMs;
+    private final AlertEvaluationService alertRules;
+    private final IncidentCorrelationService correlation;
 
     public MonitoringEngine(DeviceRepository devices, MetricSnapshotRepository metrics, AlertRepository alerts,
-                            com.nequard.incidents.IncidentRepository incidents, @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs) {
+                            com.nequard.incidents.IncidentRepository incidents, @Value("${nequard.monitoring.timeout-ms:2000}") int timeoutMs,
+                            AlertEvaluationService alertRules, IncidentCorrelationService correlation) {
         this.devices = devices;
         this.alerts = alerts;
         this.metrics = metrics;
         this.timeoutMs = timeoutMs;
+        this.alertRules = alertRules;
+        this.correlation = correlation;
     }
 
     @Scheduled(fixedDelayString = "${nequard.monitoring.interval-ms:30000}")
@@ -69,6 +78,7 @@ public class MonitoringEngine {
             alert.setOrganizationId(device.getOrganizationId());
             alert.setMessage("Automated monitoring could not reach the management endpoint. Verify upstream connectivity and device status.");
             alerts.save(alert);
+            correlation.correlate(alert);
             if (device.getOrganizationId() != null
                     && incidents.findByOrganizationIdOrderByDetectedAtDesc(device.getOrganizationId()).stream()
                     .noneMatch(i -> "DETECTED".equals(i.getStatus())
@@ -92,6 +102,12 @@ public class MonitoringEngine {
         snapshot.setMemoryPercent(device.getMemoryPercent());
         snapshot.setStatus(device.getOperationalStatus());
         metrics.save(snapshot);
+        Map<String,Double> values = new HashMap<>();
+        if (latency != null) values.put("latency", latency);
+        if (device.getCpuPercent() != null) values.put("cpu", device.getCpuPercent());
+        if (device.getMemoryPercent() != null) values.put("memory", device.getMemoryPercent());
+        values.put("packet_loss", reachable ? 0.0 : 100.0);
+        alertRules.evaluate(device, values);
     }
 
     private boolean tcpCheck(String host, int port) {
