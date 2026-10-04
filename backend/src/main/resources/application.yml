@@ -23,3 +23,7 @@ management:
 server:
   address: 0.0.0.0
   port: ${PORT:8080}
+
+nequard:
+  monitoring:
+    interval-ms: ${MONITORING_INTERVAL_MS:30000}
