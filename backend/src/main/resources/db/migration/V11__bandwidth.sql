@@ -1,0 +1,1 @@
+CREATE TABLE bandwidth_allocations(id UUID PRIMARY KEY,node_id UUID NOT NULL REFERENCES community_nodes(id) ON DELETE CASCADE,allocated_mbps DOUBLE PRECISION NOT NULL,used_mbps DOUBLE PRECISION,policy VARCHAR(40) NOT NULL DEFAULT 'FAIR_SHARE',status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE');CREATE INDEX idx_bandwidth_node ON bandwidth_allocations(node_id);
