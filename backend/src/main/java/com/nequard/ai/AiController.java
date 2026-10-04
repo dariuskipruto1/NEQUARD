@@ -1,0 +1,3 @@
+package com.nequard.ai;
+import org.springframework.web.bind.annotation.*;import java.util.*;
+@RestController @RequestMapping("/api/v1/ai") public class AiController{@GetMapping("/capabilities")public Map<String,Object> capabilities(){return Map.of("defaultMode",AiMode.READ_ONLY.name(),"allowedModes",List.of("READ_ONLY","DIAGNOSTIC","ADMINISTRATIVE"),"destructiveCommands",false,"unrestrictedSql",false);}@PostMapping("/query")public Map<String,Object> query(@RequestParam(defaultValue="READ_ONLY")AiMode mode,@RequestBody Map<String,String> body){String q=body.getOrDefault("query","");return Map.of("mode",mode.name(),"query",q,"status","SAFE_QUERY_REQUIRED","message","Natural-language operations must map to predefined, parameterized actions.");}}
