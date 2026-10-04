@@ -1,0 +1,1 @@
+package com.nequard.network;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface ServiceMonitorRepository extends JpaRepository<ServiceMonitor,UUID>{List<ServiceMonitor> findByDeviceId(UUID deviceId);}
