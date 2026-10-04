@@ -1,1 +1,1 @@
-package com.nequard.alerts;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface AlertRepository extends JpaRepository<Alert,UUID>{List<Alert> findByStatusOrderByCreatedAtDesc(String status);}
+package com.nequard.alerts;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface AlertRepository extends JpaRepository<Alert,UUID>{List<Alert> findByStatusOrderByCreatedAtDesc(String status);List<Alert> findByOrganizationIdAndStatusOrderByCreatedAtDesc(UUID organizationId,String status);}
