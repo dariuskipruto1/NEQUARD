@@ -1,0 +1,1 @@
+CREATE TABLE incidents(id UUID PRIMARY KEY,title VARCHAR(200) NOT NULL,status VARCHAR(30) NOT NULL DEFAULT 'DETECTED',priority VARCHAR(30),root_cause TEXT,confidence DOUBLE PRECISION,detected_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,resolved_at TIMESTAMPTZ);CREATE INDEX idx_incident_status_time ON incidents(status,detected_at DESC);
