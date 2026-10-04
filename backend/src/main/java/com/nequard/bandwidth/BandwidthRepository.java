@@ -1,1 +1,1 @@
-package com.nequard.bandwidth;import org.springframework.data.jpa.repository.JpaRepository;import java.util.UUID;public interface BandwidthRepository extends JpaRepository<BandwidthAllocation,UUID>{List<BandwidthAllocation> findByNodeId(UUID nodeId);}
+package com.nequard.bandwidth;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;public interface BandwidthRepository extends JpaRepository<BandwidthAllocation,UUID>{List<BandwidthAllocation> findByNodeId(UUID nodeId);}
