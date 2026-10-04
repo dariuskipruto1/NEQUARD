@@ -1,0 +1,1 @@
+package com.nequard.simulation;import org.springframework.stereotype.Service;import java.util.*;@Service public class SimulationService{public Map<String,Object> whatIf(Map<String,Object> input){return Map.of("simulated",true,"mode","SIMULATION_ONLY","input",input,"warnings",List.of("Results are estimates and do not modify production network state."));}}
